@@ -66,7 +66,25 @@ with open('Results/caltech/results/resnet18.pickle', 'rb') as f:
 
 
 features = data[4]
-W = sim_mat(features)
+# W = sim_mat(features)
 
+nr_objects = features.shape[0]
+
+print()
+
+def create_mapping(nr_objects, percentage_labels):
+    mapping = np.arange(nr_objects)
+    np.random.shuffle(mapping)
+    nr_labelled = int(percentage_labels * nr_objects)
+    labelled = mapping[:nr_labelled]
+    unlabelled = mapping[nr_labelled:]
+    return np.sort(labelled), np.sort(unlabelled)
+
+labelled, unlabelled = create_mapping(nr_objects, 0.1)
+
+print()
+
+def gen_init_probability(labels, mapping):
+    pass
 
 print()
