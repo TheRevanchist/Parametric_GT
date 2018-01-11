@@ -1,6 +1,7 @@
 import time
 import numpy as np
 from scipy import spatial
+from math import floor, log
 import pickle
 
 
@@ -61,16 +62,15 @@ def sim_mat(fc7_feats):
     return W
 
 
-with open('Results/caltech/results/resnet18.pickle', 'rb') as f:
-    data = pickle.load(f)
+# with open('Results/caltech/results/resnet18.pickle', 'rb') as f:
+#     data = pickle.load(f)
+#
+#
+# features = data[4]
+# # W = sim_mat(features)
+#
+# nr_objects = features.shape[0]
 
-
-features = data[4]
-# W = sim_mat(features)
-
-nr_objects = features.shape[0]
-
-print()
 
 def create_mapping(nr_objects, percentage_labels):
     mapping = np.arange(nr_objects)
@@ -80,11 +80,57 @@ def create_mapping(nr_objects, percentage_labels):
     unlabelled = mapping[nr_labelled:]
     return np.sort(labelled), np.sort(unlabelled)
 
-labelled, unlabelled = create_mapping(nr_objects, 0.1)
 
-print()
+def gen_init_probability(W, labels, perc_lab=0.1):
+    """
+    :param W: similarity matrix to generate the labels for the unlabelled observations
+    :param labels: labels of the already labelled observations
+    :return:
+    """
 
-def gen_init_probability(labels, mapping):
-    pass
+    n = W.shape[0]
+    k = int(log(n) + 1.)
+    labelled, unlabelled = create_mapping(n, perc_lab)
+    W = W[np.ix_(unlabelled, labelled)]
 
-print()
+    ps = np.zeros(labels.shape)
+    ps[labelled] = labels[labelled]
+
+    max_k_inds = labelled[np.argpartition(W, -k, axis=1)[:, -k:]]
+    tmp = np.zeros((unlabelled.shape[0], labels.shape[1]))
+    for row in max_k_inds.T:
+        tmp += labels[row]
+    tmp /= float(k)
+    ps[unlabelled] = tmp
+
+    return ps, labelled, unlabelled
+
+
+def unit_test():
+    """
+    unit_test for gen_init_probability function
+    :return:
+    """
+    np.random.seed(314)
+    # unlab = 0, 1, 3. lab = 2, 4, 5
+    W = np.array([[5, 3, (8), 4, (9), (1)],
+                  [1, 2, (3), 4, (7), (9)],
+                  [7, 1,  2 , 8,  4 ,  3 ],
+                  [9, 7, (4), 3, (2), (1)],
+                  [5, 7,  4 , 2,  8 ,  6 ],
+                  [6, 4,  5 , 3,  1 ,  2 ]])
+
+    labels = np.array([[0, 1, 0, 0, 0],
+                       [1, 0, 0, 0, 0],
+                       [0, 0, 1, 0, 0],
+                       [0, 0, 0, 1, 0],
+                       [0, 0, 0, 0, 1],
+                       [0, 1, 0, 0, 0]])
+
+    res = np.array([[0, 0  , 0.5, 0, 0.5],
+                    [0, 0.5, 0  , 0, 0.5],
+                    [0, 0  , 1  , 0, 0  ],
+                    [0, 0  , 0.5, 0, 0.5],
+                    [0, 0  , 0  , 0, 1  ],
+                    [0, 1  , 0  , 0, 0  ]])
+    print(gen_init_probability(W, labels, 0.5))
