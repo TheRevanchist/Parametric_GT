@@ -55,8 +55,6 @@ def gen_init_probability(W, labels, labelled, unlabelled):
 
     return ps
 
-# labels_prob_seba = gen_init_probability(W, label_one_hot, labelled, unlabelled)
-labels_prob_uni = gen_init_rand_probability(labels, labelled, unlabelled, nr_classes)
 
 def get_accuracy(W, softmax_features, labels, labelled, unlabelled, testing_set_size):
     """
@@ -81,14 +79,14 @@ def gen_gtg_label_file(fnames, names_folds, labels_GT, out_fname):
             file.write(new_name)
 
 
-file = open('only_labelled.txt', 'w')
-# and here we create a similar file just for the labelled data
-for i in xrange(len(names_of_files)):
-    splitted_name = names_of_files[i][0].split('/')
-    if i in labelled:
-        new_name = splitted_name[8] + '/' + splitted_name[9] + ' ' + splitted_name[8] + "\n"
-        file.write(new_name)
-file.close()
+# file = open('only_labelled.txt', 'w')
+# # and here we create a similar file just for the labelled data
+# for i in xrange(len(names_of_files)):
+#     splitted_name = names_of_files[i][0].split('/')
+#     if i in labelled:
+#         new_name = splitted_name[8] + '/' + splitted_name[9] + ' ' + splitted_name[8] + "\n"
+#         file.write(new_name)
+# file.close()
 
 
 def unit_test():

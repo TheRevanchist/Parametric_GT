@@ -26,7 +26,6 @@ def main():
             net, feature_size = fe.get_net_info(net_type.split("_")[0], number_of_classes, nets_and_features)
 
             train_loader = prepare_loader_val(dataset_train, stats, batch_size)
-
             # if net is densenet
             if net_type[:3] == 'den':
                 fc7_features_tr, labels, net, fnames = fe.extract_features_train(net, feature_size, dataset_size_train,

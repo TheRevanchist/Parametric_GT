@@ -1,11 +1,7 @@
 import time
 import numpy as np
 from scipy import spatial
-from math import log
 import pickle
-import sklearn.metrics
-from gtg import gtg
-import os
 from pathlib2 import Path
 
 np.random.seed(2718)

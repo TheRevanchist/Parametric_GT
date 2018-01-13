@@ -1,6 +1,7 @@
 import numpy as np
 import sklearn.metrics
 import time
+from scipy import spatial
 
 
 def gtg(W, X, L, U, max_iter=100, labels=None):
@@ -30,13 +31,10 @@ def sim_mat(fc7_feats):
     :param fc7_feats: the fc7 features
     :return: matrix_S - the sparsified matrix S
     """
+    print("Something")
     t = time.time()
     pdist_ = spatial.distance.pdist(fc7_feats)
     print('Created distance matrix' + ' ' + str(time.time() - t) + ' sec')
-
-    # t = time.time()
-    # pdist_ = pdist_.astype(np.float32)
-    # print('Converted to float32' + ' ' + str(time.time() - t) + ' sec')
 
     t = time.time()
     dist_mat = spatial.distance.squareform(pdist_)

@@ -1,11 +1,8 @@
 import pickle
 import os
 
-with open('Results/caltech/results/resnet18.pickle', 'rb') as f:
+with open('out/caltech/feature_data/resnet18_0.pickle', 'rb') as f:
     data = pickle.load(f)
-
-names_folds = os.listdir('Datasets/caltech/train')
-names_folds.sort()
 
 names = data[4]
 for i in xrange(len(names)):

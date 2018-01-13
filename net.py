@@ -38,9 +38,7 @@ def main():
         print('Accuracy: ' + str(net_accuracy))
 
 
-def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs, out_dir):
-    accuracy = 0
-    early_stopping = 0
+def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs, out_dir, ind):
 
     for epoch in range(epochs):
         net.train()
@@ -67,18 +65,8 @@ def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs,
         new_accuracy = evaluate(net, val_loader)
         print(new_accuracy)
 
-        if new_accuracy > accuracy:
-            accuracy = new_accuracy
-
-            if epoch > 0:
-                os.remove(net_name)
-            net_name = out_dir + '/' + net_type + '_epochs' + str(epoch) + '.pth'
-            torch.save(net.state_dict(), net_name)
-            early_stopping = 0
-        else:
-            early_stopping += 1
-            if early_stopping == 5:  # if there is no improvement on 5 epochs, stop the training
-                break
+        net_name = out_dir + '/' + net_type + ind + '.pth'
+        torch.save(net.state_dict(), net_name)
 
     return net_name
 

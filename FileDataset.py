@@ -1,5 +1,6 @@
 import os
 from skimage import io
+from skimage import io
 
 import torch.utils.data
 
