@@ -3,7 +3,7 @@ import torchvision
 
 import os
 import torch.nn as nn
-# from ImageFolder2 import ImageFolder2
+from ImageFolder2 import ImageFolder3
 
 
 def misc(user, current_dataset):
@@ -28,15 +28,9 @@ def dataset_size(dataset):
 
 
 def prepare_dataset(dataset):
-    if dataset[-8:] != 'imagenet':
-        dataset_train = os.path.join(dataset, 'train')
-        dataset_val = os.path.join(dataset, 'val')
-        dataset_test = os.path.join(dataset, 'test')
-        return dataset_train, dataset_val, dataset_test
-    else:
-        dataset_train = os.path.join(dataset, 'train')
-        dataset_val = os.path.join(dataset, 'val')
-        return dataset_train, dataset_val
+    dataset_train = os.path.join(dataset, 'train')
+    dataset_test = os.path.join(dataset, 'test')
+    return dataset_train, dataset_test
 
 
 def create_dict_nets_and_features():
@@ -73,8 +67,7 @@ def prepare_loader_train(dataset, stats, batch_size):
         torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
                                          std=(stats[3], stats[4], stats[5]))
     ])
-    train = torchvision.datasets.ImageFolder(dataset, transform)
-    # train = ImageFolder2(dataset, transform)
+    train = ImageFolder3(dataset, transform)
     train_loader = torch.utils.data.DataLoader(train, batch_size=batch_size, shuffle=True, num_workers=12, pin_memory=True)
     return train_loader
 
@@ -87,8 +80,7 @@ def prepare_loader_val(dataset, stats, batch_size):
         torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
                                          std=(stats[3], stats[4], stats[5]))
     ])
-    val = torchvision.datasets.ImageFolder(dataset, transform)
-    # val = ImageFolder2(dataset, transform)
+    val = ImageFolder3(dataset, transform)
     val_loader = torch.utils.data.DataLoader(val, batch_size=batch_size, shuffle=False, num_workers=12, pin_memory=True)
     return val_loader
 

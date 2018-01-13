@@ -34,7 +34,7 @@ def main():
         best_net = train(net, net_type, train_loader, test_loader, optimizer, criterion, max_epochs, out_dir)
 
         net.load_state_dict(torch.load(best_net))
-        net_accuracy = evaluate(net, test_loader, net_type)
+        net_accuracy = evaluate(net, test_loader)
         print('Accuracy: ' + str(net_accuracy))
 
 
@@ -64,7 +64,7 @@ def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs,
             running_loss = 0.0
 
         print("Validating results in: " + str(epoch) + "-th epoch")
-        new_accuracy = evaluate(net, val_loader, net_type)
+        new_accuracy = evaluate(net, val_loader)
         print(new_accuracy)
 
         if new_accuracy > accuracy:
@@ -83,16 +83,14 @@ def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs,
     return net_name
 
 
-def evaluate(net, test_loader, net_type):
+def evaluate(net, test_loader):
     net.eval()
     correct = 0
     total = 0
     for data in test_loader:
-        inputs, labels, index = data
+        inputs, labels, _ = data
         inputs, labels = inputs.cuda(), labels.cuda()
         outputs = net(torch.autograd.Variable(inputs))
-        if net_type == 'inception':
-            outputs = outputs[0]
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()

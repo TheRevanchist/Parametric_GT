@@ -33,7 +33,6 @@ def extract_features_train(net, feature_size, dataset_size, train_loader, dense=
 
     for k, data in enumerate(train_loader, 0):
         inputs, labels, index = data
-        print(index)
         inputs, labels = torch.autograd.Variable(inputs).cuda(), torch.autograd.Variable(labels).cuda()
         outputs = net(inputs)
         if dense:

@@ -5,18 +5,20 @@ import random
 root = 'Datasets'
 
 
-def split(dataset_name, tr_perc, n=1):
+def split(dataset_name, tr_perc, n=5):
     source = os.path.join(root, dataset_name)
-    folders = os.listdir(source)
 
     for i in range(n):
         for folder in os.listdir(source):
             source_folder = os.path.join(source, folder)
-            train_folder = os.path.join(root, 'train_' + str(n), folder)
-            test_folder = os.path.join(root, 'test_' + str(n), folder)
+            train_folder = os.path.join(root, 'caltech', 'train_' + str(i), folder)
+            test_folder = os.path.join(root, 'caltech', 'test_' + str(i), folder)
 
-            os.makedirs(train_folder)
-            os.makedirs(test_folder)
+            try:
+                os.makedirs(train_folder)
+                os.makedirs(test_folder)
+            except IOError:
+                pass
 
             files = os.listdir(source_folder)
             random.shuffle(files)
@@ -45,8 +47,7 @@ def gen_gtg_dataset(dataset_name, data_fname, lab_perc):
             shutil.copy(os.path.join(source, fname), dst_pname)
 
 
-
-
 if __name__ == '__main__':
-    # split('caltech', 0.7, n=1)
-    gen_gtg_dataset('caltech/train', 'only_labelled.txt', 0.1)
+    split('caltech/caltech_src', 0.7, n=5)
+    random.seed(2718)
+    # gen_gtg_dataset('caltech/train', 'only_labelled.txt', 0.1)
