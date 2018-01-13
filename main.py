@@ -29,8 +29,6 @@ def main():
             train_loader = prepare_loader_val(dataset_train, stats, batch_size)
             test_loader = prepare_loader_val(dataset_test, stats, batch_size)
 
-            accuracy = evaluate(net, test_loader)
-
             # if net is densenet
             if net_type[:3] == 'den':
                 fc7_features_tr, labels, net, fnames = fe.extract_features_train(net, feature_size, dataset_size_train,
@@ -41,7 +39,7 @@ def main():
                                                                                  train_loader, dense=0)
 
             # store the name of the net, the dataset on which we are going to use it, and the testing accuracy
-            net_info = [net_type.split("_")[0], accuracy, labels, fc7_features_tr, fnames]
+            net_info = [net_type.split("_")[0], labels, fc7_features_tr, fnames]
             with open(os.path.join(out_dir, net_type.split("_")[0] + '_' + str(j) + '.pickle'), 'wb') as f:
                 pickle.dump(net_info, f, pickle.HIGHEST_PROTOCOL)
 
