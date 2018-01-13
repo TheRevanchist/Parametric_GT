@@ -1,8 +1,9 @@
 import torch
 import torchvision
+
 import os
 import torch.nn as nn
-from ImageFolder2 import ImageFolder2
+# from ImageFolder2 import ImageFolder2
 
 
 def misc(user, current_dataset):
@@ -20,9 +21,9 @@ def misc(user, current_dataset):
 
 
 def dataset_size(dataset):
-    sizes = {'imagenet': (50000, 50000),
-             'caltech': (20730, 9051),
-             'sun': (4994, 5000)}
+    sizes = {'imagenet': 50000,
+             'caltech': 20730,
+             'sun': 4994}
     return sizes[dataset]
 
 
@@ -64,46 +65,28 @@ def create_net(number_of_classes, nets_and_features, net_type='resnet152'):
     return net, feature_size
 
 
-def prepare_loader_train(dataset, stats, batch_size, inception=0):
-    if not inception:
-        transform = torchvision.transforms.Compose([
-            torchvision.transforms.RandomSizedCrop(224),
-            torchvision.transforms.RandomHorizontalFlip(),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
-                                             std=(stats[3], stats[4], stats[5]))
-        ])
-    else:
-        transform = torchvision.transforms.Compose([
-            torchvision.transforms.RandomSizedCrop(299),
-            torchvision.transforms.RandomHorizontalFlip(),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
-                                             std=(stats[3], stats[4], stats[5]))
-        ])
+def prepare_loader_train(dataset, stats, batch_size):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.RandomSizedCrop(224),
+        torchvision.transforms.RandomHorizontalFlip(),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
+                                         std=(stats[3], stats[4], stats[5]))
+    ])
     # train = torchvision.datasets.ImageFolder(dataset, transform)
     train = ImageFolder2(dataset, transform)
     train_loader = torch.utils.data.DataLoader(train, batch_size=batch_size, shuffle=True, num_workers=12, pin_memory=True)
     return train_loader
 
 
-def prepare_loader_val(dataset, stats, batch_size, inception=0):
-    if not inception:
-        transform = torchvision.transforms.Compose([
-            torchvision.transforms.Scale(256),
-            torchvision.transforms.CenterCrop(224),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
-                                             std=(stats[3], stats[4], stats[5]))
-        ])
-    else:
-        transform = torchvision.transforms.Compose([
-            torchvision.transforms.Scale(342),
-            torchvision.transforms.CenterCrop(299),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
-                                             std=(stats[3], stats[4], stats[5]))
-        ])
+def prepare_loader_val(dataset, stats, batch_size):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.Scale(256),
+        torchvision.transforms.CenterCrop(224),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
+                                         std=(stats[3], stats[4], stats[5]))
+    ])
     # val = torchvision.datasets.ImageFolder(dataset, transform)
     val = ImageFolder2(dataset, transform)
     val_loader = torch.utils.data.DataLoader(val, batch_size=batch_size, shuffle=False, num_workers=12, pin_memory=True)
