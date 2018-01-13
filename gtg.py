@@ -1,5 +1,6 @@
 import numpy as np
 import sklearn.metrics
+import time
 
 
 def gtg(W, X, L, U, max_iter=100, labels=None):

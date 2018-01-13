@@ -35,12 +35,18 @@ def gen_gtg_dataset(dataset_name, data_fname, lab_perc):
 
     with open(data_fname, 'r') as f:
         for line in f:
-            fname, lab = line.split(sep=' ')
-            dst_pname = os.path.join(root, 'train_gtg_' + str(lab_perc), lab)
-            os.makedirs(dst_pname)
+            fname, lab = line.split(' ')
+            lab = lab[:-1]
+            dst_pname = os.path.join(root, 'caltech', 'train_labelled' + str(lab_perc), lab)
+            try:
+                os.makedirs(dst_pname)
+            except OSError:
+                pass
             shutil.copy(os.path.join(source, fname), dst_pname)
+
+
 
 
 if __name__ == '__main__':
     # split('caltech', 0.7, n=1)
-    gen_gtg_dataset('caltech', '<insert name of lab file here>', 0.1)
+    gen_gtg_dataset('caltech/train', 'only_labelled.txt', 0.1)

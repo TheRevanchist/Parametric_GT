@@ -8,34 +8,31 @@ from utils import prepare_dataset, prepare_loader_train, prepare_loader_val, mis
 
 def main():
     user = os.path.expanduser("~")
-    user = os.path.join(user, 'PycharmProjects/boosting_classifier_with_games')
+    user = os.path.join(user, 'PycharmProjects/Parametric_GT')
 
-    current_dataset = 'sun'
-    max_epochs = 1
+    current_dataset = 'caltech'
+    max_epochs = 20
     batch_size = 8
 
     dataset, stats, number_of_classes = misc(user, current_dataset)
-    dataset_train, dataset_val, dataset_test = prepare_dataset(dataset)
-
-    out_dir = os.path.join(os.path.join(os.path.join(user, 'Results'), current_dataset), 'nets')
+    dataset_train = os.path.join(dataset, 'train_labelled0.1')
+    dataset_test = os.path.join(dataset, 'test')
 
     nets_and_features = create_dict_nets_and_features()
-    net_types = ['resnet18', 'densenet121', 'inception']
+    net_types = ['resnet18']
+    out_dir = os.path.join(os.path.join(os.path.join(user, 'Results'), current_dataset), 'nets')
 
     for net_type in net_types:
-        if net_type == 'inception':
-            inception = 1
-        else:
-            inception = 0
-        train_loader = prepare_loader_train(dataset_train, stats, batch_size, inception=inception)
-        val_loader = prepare_loader_val(dataset_val, stats, batch_size, inception=inception)
-        test_loader = prepare_loader_val(dataset_test, stats, batch_size, inception=inception)
+        inception = net_type == 'inception'
+        train_loader = prepare_loader_train(dataset_train, stats, batch_size, inception)
+        test_loader = prepare_loader_val(dataset_test, stats, batch_size, inception)
 
         net, feature_size = create_net(number_of_classes, nets_and_features, net_type=net_type)
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(net.parameters(), lr=3e-4)
+        optimizer = optim.Adam(net.parameters(), lr=1e-4)
 
-        best_net = train(net, net_type, train_loader, val_loader, optimizer, criterion, max_epochs, out_dir)
+        best_net = train(net, net_type, train_loader, test_loader, optimizer, criterion, max_epochs, out_dir)
+
         net.load_state_dict(torch.load(best_net))
         net_accuracy = evaluate(net, test_loader, net_type)
         print('Accuracy: ' + str(net_accuracy))
@@ -50,7 +47,7 @@ def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs,
         print(net_type + ' --------- ' + 'Epoch: ' + str(epoch))
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
-            inputs, labels = data
+            inputs, labels, index = data
             inputs, labels = torch.autograd.Variable(inputs).cuda(), torch.autograd.Variable(labels).cuda()
             optimizer.zero_grad()
             outputs = net(inputs)
@@ -91,7 +88,7 @@ def evaluate(net, test_loader, net_type):
     correct = 0
     total = 0
     for data in test_loader:
-        inputs, labels = data
+        inputs, labels, index = data
         inputs, labels = inputs.cuda(), labels.cuda()
         outputs = net(torch.autograd.Variable(inputs))
         if net_type == 'inception':

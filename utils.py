@@ -2,6 +2,7 @@ import torch
 import torchvision
 import os
 import torch.nn as nn
+from ImageFolder2 import ImageFolder2
 
 
 def misc(user, current_dataset):
@@ -80,7 +81,8 @@ def prepare_loader_train(dataset, stats, batch_size, inception=0):
             torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
                                              std=(stats[3], stats[4], stats[5]))
         ])
-    train = torchvision.datasets.ImageFolder(dataset, transform)
+    # train = torchvision.datasets.ImageFolder(dataset, transform)
+    train = ImageFolder2(dataset, transform)
     train_loader = torch.utils.data.DataLoader(train, batch_size=batch_size, shuffle=True, num_workers=12, pin_memory=True)
     return train_loader
 
@@ -102,7 +104,8 @@ def prepare_loader_val(dataset, stats, batch_size, inception=0):
             torchvision.transforms.Normalize(mean=(stats[0], stats[1], stats[2]),
                                              std=(stats[3], stats[4], stats[5]))
         ])
-    val = torchvision.datasets.ImageFolder(dataset, transform)
+    # val = torchvision.datasets.ImageFolder(dataset, transform)
+    val = ImageFolder2(dataset, transform)
     val_loader = torch.utils.data.DataLoader(val, batch_size=batch_size, shuffle=False, num_workers=12, pin_memory=True)
     return val_loader
 

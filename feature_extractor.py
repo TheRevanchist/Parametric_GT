@@ -41,19 +41,19 @@ def main():
                                                                              train_loader, number_of_classes)
         # if net is inception
         if net_type == 'inception':
-            fc7_features_train, feature_labels_train, net = extract_features_train(net, feature_size, dataset_size_train,
+            fc7_features_train, feature_labels_train, net, names_of_files = extract_features_train(net, feature_size, dataset_size_train,
                                                                                    train_loader, dense=0, inception=1)
         # if net is densenet
         elif net_type[:3] == 'den':
-            fc7_features_train, feature_labels_train, net = extract_features_train(net, feature_size, dataset_size_train,
+            fc7_features_train, feature_labels_train, net, names_of_files = extract_features_train(net, feature_size, dataset_size_train,
                                                                                    train_loader, dense=1, inception=0)
         # if net is resnet
         else:
-            fc7_features_train, feature_labels_train, net = extract_features_train(net, feature_size, dataset_size_train,
+            fc7_features_train, feature_labels_train, net, names_of_files = extract_features_train(net, feature_size, dataset_size_train,
                                                                                    train_loader, dense=0, inception=0)
 
         # store the name of the net, the dataset on which we are going to use it, and the testing accuracy
-        net_info = [net_type.split("_")[0], accuracy, softmax_features_train, softmax_labels_train, fc7_features_train]
+        net_info = [net_type.split("_")[0], accuracy, softmax_labels_train, fc7_features_train, names_of_files]
         with open(os.path.join(out_dir, net_type.split("_")[0] + '.pickle'), 'wb') as f:
             pickle.dump(net_info, f, pickle.HIGHEST_PROTOCOL)
 
@@ -71,7 +71,8 @@ def extract_softmax_test(net, classes_number, dataset_size, test_loader, incepti
     m = nn.Softmax()
 
     for j, data in enumerate(test_loader, 0):
-        inputs, labels = data
+        inputs, labels, index = data
+        print(index)
         inputs, labels = torch.autograd.Variable(inputs).cuda(), torch.autograd.Variable(labels).cuda()
         outputs = net(inputs)
         if inception:
@@ -89,7 +90,8 @@ def extract_softmax_train(net, classes_number, dataset_size, train_loader, numbe
     features = torch.zeros(dataset_size, classes_number)
     labels_ = torch.zeros(dataset_size, 1)
     for k, data in enumerate(train_loader, 0):
-        inputs, labels = data
+        inputs, labels, index = data
+        print(index)
         features[k, :] = create_softmax_from_ground_truth(labels[0], number_of_classes)
         labels_[k, :] = labels
 
@@ -111,7 +113,8 @@ def extract_features_test(net, feature_size, dataset_size, test_loader, dense=0,
     labels_ = torch.zeros(dataset_size, 1)
 
     for j, data in enumerate(test_loader, 0):
-        inputs, labels = data
+        inputs, labels, index = data
+        print(index)
         inputs, labels = torch.autograd.Variable(inputs).cuda(), torch.autograd.Variable(labels).cuda()
         outputs = net(inputs)
         if inception:
@@ -138,8 +141,11 @@ def extract_features_train(net, feature_size, dataset_size, train_loader, dense=
     features = torch.zeros(dataset_size, feature_size)
     labels_ = torch.zeros(dataset_size, 1)
 
+    names_of_files = []
+
     for k, data in enumerate(train_loader, 0):
-        inputs, labels = data
+        inputs, labels, index = data
+        print(index)
         inputs, labels = torch.autograd.Variable(inputs).cuda(), torch.autograd.Variable(labels).cuda()
         outputs = net(inputs)
         if inception:
@@ -151,10 +157,11 @@ def extract_features_train(net, feature_size, dataset_size, train_loader, dense=
             outputs = F.relu(outputs)
         features[k, :] = outputs.data
         labels_[k, :] = labels.data
+        names_of_files.append(index)
 
     fc7_features = features.numpy()
     labels = labels_.numpy()
-    return fc7_features, labels, net
+    return fc7_features, labels, net, names_of_files
 
 
 if __name__ == "__main__":
