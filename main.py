@@ -7,27 +7,25 @@ from net import evaluate
 
 
 def main():
-    user = os.path.expanduser("~")
-    user = os.path.join(user, 'PycharmProjects/Parametric_GT')
+    root = 'PycharmProjects/Parametric_GT'
     current_dataset = 'caltech'
-    out_dir = os.path.join(os.path.join(os.path.join(user, 'out'), current_dataset), 'results')
+    out_dir = os.path.join(root, 'out', current_dataset, 'feature_data')
     batch_size = 1
 
     nets_and_features = create_dict_nets_and_features()
-    dataset, stats, number_of_classes = misc(user, current_dataset)
+    dataset, stats, number_of_classes = misc(root, current_dataset)
     dataset_train, dataset_test = prepare_dataset(dataset)
 
     for j in xrange(5):
         dataset_train += '_' + str(j)
         dataset_test += '_' + str(j)
-        list_of_net_names = ['resnet18', 'resnet152']#, 'densenet121', 'densenet201']
+        list_of_net_names = ['resnet18', 'resnet152']  # , 'densenet121', 'densenet201']
         dataset_size_train = dataset_size(current_dataset)
 
         for i, net_type in enumerate(list_of_net_names):
             net, feature_size = fe.get_net_info(net_type.split("_")[0], number_of_classes, nets_and_features)
 
             train_loader = prepare_loader_val(dataset_train, stats, batch_size)
-            test_loader = prepare_loader_val(dataset_test, stats, batch_size)
 
             # if net is densenet
             if net_type[:3] == 'den':
