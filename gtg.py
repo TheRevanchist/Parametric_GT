@@ -4,7 +4,6 @@ import time
 
 
 def gtg(W, X, L, U, max_iter=100, labels=None):
-
     iter = 0
     Xbin = X[L, :] > 0.0
 
