@@ -12,41 +12,38 @@ from pathlib2 import Path
 import torchvision
 from split_dataset import gen_gtg_dataset, gen_labelled_dataset
 from utils import prepare_loader_train, prepare_loader_val, create_net, create_dict_nets_and_features
+import numpy as np
 
 
 def main2():
+
+    # open the file we have to fill
+    results = 'results.txt'
+    with open(results, 'w') as file:
+        file.write("Net name " + " trial ind " +  "Accuracy net + gtg " + "Accuracy net " + "Accuracy gtg" + "\n")
+
     root = '.'
     current_dataset = 'caltech'
     out_dir = os.path.join(root, 'out', current_dataset)
     feature_dir = os.path.join(out_dir, 'feature_data')
     feature_test_dir = os.path.join(out_dir, 'feature_data_test')
-    net_dir = os.path.join(out_dir, 'net')
+    net_dir = os.path.join(out_dir, 'nets')
+    nets_dir_test = os.path.join(out_dir, 'nets_test')
     gtg_labels_dir = os.path.join(out_dir, 'gtg_labels')
     only_labelled = os.path.join(out_dir, 'only_labelled')
     nr_classes = 256
     nets_and_features = create_dict_nets_and_features()
-    results = 'results.txt'
 
     for pkl_name in os.listdir(feature_dir):
         with open(os.path.join(feature_dir, pkl_name), 'rb') as pkl:
             net_name, labels, features, fnames = pickle.load(pkl)
 
-        W = Path('W.pickle')
-        if W.exists():
-            with open('W.pickle', 'rb') as f:
-                W = pickle.load(f)
-        else:
-            W = gtg.sim_mat(features)
-            with open('W.pickle', 'wb') as f:
-                pickle.dump(W, f, pickle.HIGHEST_PROTOCOL)
-        # W = gtg.sim_mat(features)
+        W = gtg.sim_mat(features)
         nr_objects = features.shape[0]
         labelled, unlabelled = utils2.create_mapping(nr_objects, 0.1)
         ps = utils2.gen_init_rand_probability(labels, labelled, unlabelled, nr_classes)
         gtg_accuracy, Ps_new = utils2.get_accuracy(W, ps, labels, labelled, unlabelled, len(unlabelled))
         gtg_labels = Ps_new.argmax(axis=1)
-
-        # now check gt in the testing set
 
         nname, ind = pkl_name.split('_')
 
@@ -60,11 +57,13 @@ def main2():
 
         stats = (.517, .5015, .4736, .315, .3111, .324)
 
+        del W
+
         dataset = 'Datasets/' + current_dataset
         dataset_train = os.path.join(dataset, 'train_labelled_' + ind[0])
         dataset_test = os.path.join(dataset, 'test_' + ind[0])
 
-        max_epochs = 1
+        max_epochs = 10
         batch_size = 8
 
         train_loader = prepare_loader_train(dataset_train, stats, batch_size)
@@ -74,18 +73,19 @@ def main2():
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(net.parameters(), lr=1e-4)
 
-        trained_net = train(net, nname, train_loader, test_loader, optimizer, criterion, max_epochs, out_dir, ind[0])
+        trained_net = train(net, nname, train_loader, test_loader, optimizer, criterion, max_epochs, net_dir, ind[0])
 
         net.load_state_dict(torch.load(trained_net))
-        net_accuracy = evaluate(net, test_loader) # toDO: store this
-        print('Accuracy: ' + str(net_accuracy))
+        net_accuracy_gtg = evaluate(net, test_loader)
+        print('Accuracy: ' + str(net_accuracy_gtg))
+
 
         # now check the accuracy of the net trained only in the labelled set
         label_file = os.path.join(only_labelled, nname + '.txt')
-        utils2.gen_gtg_label_file(fnames, names_folds, gtg_labels, gtg_label_file)
+        utils2.only_labelled_file(fnames, labelled, label_file)
         gen_labelled_dataset('caltech/train_' + str(ind[0]), label_file, ind[0])
 
-        dataset_train = os.path.join(dataset, 'train_only_labelled_' + ind[0])
+        dataset_train = os.path.join(dataset, 'train_labelled_' + ind[0])
 
         train_loader = prepare_loader_train(dataset_train, stats, batch_size)
         test_loader = prepare_loader_val(dataset_test, stats, batch_size)
@@ -94,18 +94,29 @@ def main2():
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(net.parameters(), lr=1e-4)
 
-        trained_net = train(net, nname, train_loader, test_loader, optimizer, criterion, max_epochs, out_dir, ind[0])
+        trained_net = train(net, nname, train_loader, test_loader, optimizer, criterion, max_epochs, nets_dir_test, ind[0])
 
         net.load_state_dict(torch.load(trained_net))
-        net_accuracy = evaluate(net, test_loader) # toDO: store this
+        net_accuracy = evaluate(net, test_loader)
 
-        # finally, do gtg with the testing set
+
+        # # finally, do gtg with the testing set
         with open(os.path.join(feature_test_dir, pkl_name), 'rb') as pkl:
-            net_name, labels, features, fnames = pickle.load(pkl)
+            net_name_test, labels_test, features_test, fnames_test = pickle.load(pkl)
 
+        features_combined = np.vstack((features, features_test))
+        labels_combined = np.vstack((labels, labels_test))
+        W = gtg.sim_mat(features_combined)
+        labelled = np.arange(features.shape[0])
+        unlabelled = np.arange(features.shape[0], features.shape[0] + features_test.shape[0])
+
+        ps = utils2.gen_init_rand_probability(labels_combined, labelled, unlabelled, nr_classes)
+        gtg_accuracy_test, Ps_new = utils2.get_accuracy(W, ps, labels, labelled, unlabelled, len(unlabelled))
+
+        with open(results, 'a') as file:
+            file.write(nname + " " + ind[0] + " " + str(net_accuracy_gtg) + " " + str(net_accuracy) + " " + str(gtg_accuracy_test) + "\n")
 
         print()
-
 
 
 if __name__ == '__main__':

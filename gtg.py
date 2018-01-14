@@ -18,7 +18,11 @@ def gtg(W, X, L, U, max_iter=100, labels=None):
         if (not labels is None):
             conf = sklearn.metrics.confusion_matrix(labels[U, :], (X[U, :]).argmax(axis=1))
             acc = float(conf.trace()) / conf.sum()
+            P = X.argmax(axis=1)
+            s_correct = (labels[U] == P).sum()
+            acc = float(s_correct)/len(U)
             print('Accuracy at iter ' + str(iter) + ': ' + str(acc))
+            # print('Accuracy at iter ' + str(iter) + ': ' + str(acc))
 
         iter += 1
 

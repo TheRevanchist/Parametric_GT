@@ -66,7 +66,7 @@ def get_accuracy(W, softmax_features, labels, labelled, unlabelled, testing_set_
     :param testing_set_size: the size of the testing set
     :return: accuracy of our method, accuracy of cnn
     """
-    P_new = gtg.gtg(W, softmax_features, labelled, unlabelled, max_iter=1, labels=labels)
+    P_new = gtg.gtg(W, softmax_features, labelled, unlabelled, max_iter=25, labels=labels)
     conf = sklearn.metrics.confusion_matrix(labels[unlabelled, :], (P_new[unlabelled, :]).argmax(axis=1))
     return float(conf.trace()) / conf.sum(), P_new
 
@@ -79,14 +79,13 @@ def gen_gtg_label_file(fnames, names_folds, labels_GT, out_fname):
             file.write(new_name)
 
 
-# file = open('only_labelled.txt', 'w')
-# # and here we create a similar file just for the labelled data
-# for i in xrange(len(names_of_files)):
-#     splitted_name = names_of_files[i][0].split('/')
-#     if i in labelled:
-#         new_name = splitted_name[8] + '/' + splitted_name[9] + ' ' + splitted_name[8] + "\n"
-#         file.write(new_name)
-# file.close()
+def only_labelled_file(fnames, labelled, out_fname):
+    with open(out_fname, 'w') as file:
+        for i in xrange(len(fnames)):
+            splitted_name = fnames[i][0].split('/')
+            if i in labelled:
+                new_name = splitted_name[8] + '/' + splitted_name[9] + ' ' + splitted_name[8] + "\n"
+                file.write(new_name)
 
 
 def unit_test():
