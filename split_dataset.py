@@ -32,14 +32,29 @@ def split(dataset_name, tr_perc, n=5):
                 shutil.copy(os.path.join(source_folder, file), test_folder)
 
 
-def gen_gtg_dataset(dataset_name, data_fname, lab_perc):
+def gen_gtg_dataset(dataset_name, data_fname, ind):
     source = os.path.join(root, dataset_name)
 
     with open(data_fname, 'r') as f:
         for line in f:
             fname, lab = line.split(' ')
             lab = lab[:-1]
-            dst_pname = os.path.join(root, 'caltech', 'train_labelled' + str(lab_perc), lab)
+            dst_pname = os.path.join(root, 'caltech', 'train_labelled' + '_' + str(ind), lab)
+            try:
+                os.makedirs(dst_pname)
+            except OSError:
+                pass
+            shutil.copy(os.path.join(source, fname), dst_pname)
+
+
+def gen_labelled_dataset(dataset_name, data_fname, ind):
+    source = os.path.join(root, dataset_name)
+
+    with open(data_fname, 'r') as f:
+        for line in f:
+            fname, lab = line.split(' ')
+            lab = lab[:-1]
+            dst_pname = os.path.join(root, 'caltech', 'train_only_labelled' + '_' + str(ind), lab)
             try:
                 os.makedirs(dst_pname)
             except OSError:

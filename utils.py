@@ -21,9 +21,9 @@ def misc(user, current_dataset):
 
 
 def dataset_size(dataset):
-    sizes = {'imagenet': 50000,
-             'caltech': 20730,
-             'sun': 4994}
+    sizes = {'imagenet': (50000,1),
+             'caltech': (20730, 9051),
+             'sun': (4994, 1)}
     return sizes[dataset]
 
 
