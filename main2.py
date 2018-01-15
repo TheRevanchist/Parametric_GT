@@ -63,7 +63,7 @@ def main2():
         dataset_train = os.path.join(dataset, 'train_labelled_' + ind[0])
         dataset_test = os.path.join(dataset, 'test_' + ind[0])
 
-        max_epochs = 10
+        max_epochs = 1
         batch_size = 8
 
         train_loader = prepare_loader_train(dataset_train, stats, batch_size)
@@ -85,7 +85,7 @@ def main2():
         utils2.only_labelled_file(fnames, labelled, label_file)
         gen_labelled_dataset('caltech/train_' + str(ind[0]), label_file, ind[0])
 
-        dataset_train = os.path.join(dataset, 'train_labelled_' + ind[0])
+        dataset_train = os.path.join(dataset, 'train_only_labelled_' + ind[0])
 
         train_loader = prepare_loader_train(dataset_train, stats, batch_size)
         test_loader = prepare_loader_val(dataset_test, stats, batch_size)
@@ -104,14 +104,14 @@ def main2():
         with open(os.path.join(feature_test_dir, pkl_name), 'rb') as pkl:
             net_name_test, labels_test, features_test, fnames_test = pickle.load(pkl)
 
-        features_combined = np.vstack((features, features_test))
-        labels_combined = np.vstack((labels, labels_test))
+        features_combined = np.vstack((features[labelled,:], features_test))
+        labels_combined = np.vstack((labels[labelled], labels_test))
         W = gtg.sim_mat(features_combined)
-        labelled = np.arange(features.shape[0])
-        unlabelled = np.arange(features.shape[0], features.shape[0] + features_test.shape[0])
+        labelled = np.arange(features[labelled,:].shape[0])
+        unlabelled = np.arange(features[labelled,:].shape[0], features_combined.shape[0])
 
         ps = utils2.gen_init_rand_probability(labels_combined, labelled, unlabelled, nr_classes)
-        gtg_accuracy_test, Ps_new = utils2.get_accuracy(W, ps, labels, labelled, unlabelled, len(unlabelled))
+        gtg_accuracy_test, Ps_new = utils2.get_accuracy(W, ps, labels_combined, labelled, unlabelled, len(unlabelled))
 
         with open(results, 'a') as file:
             file.write(nname + " " + ind[0] + " " + str(net_accuracy_gtg) + " " + str(net_accuracy) + " " + str(gtg_accuracy_test) + "\n")
