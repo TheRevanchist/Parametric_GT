@@ -1,6 +1,7 @@
 import numpy as np
 import sklearn
 import gtg
+import random
 import os
 from math import log
 
@@ -20,6 +21,25 @@ def create_mapping(nr_objects, percentage_labels):
     labelled = mapping[:nr_labelled]
     unlabelled = mapping[nr_labelled:]
     return np.sort(labelled), np.sort(unlabelled)
+
+
+def create_mapping2(labels, percentage_labels):
+    nr_classes = labels.max() + 1
+
+    labelled, unlabelled = [], []
+    for n_class in xrange(nr_classes):
+        class_labels = list(np.where(labels == n_class)[0])
+        split = int(percentage_labels * len(class_labels))
+        random.shuffle(class_labels)
+        labelled += class_labels[:split]
+        unlabelled += class_labels[split:]
+    return np.array(labelled), np.array(unlabelled)
+
+
+def unit_test_create_mapping2():
+    random.seed(20)
+    labels = np.array([1, 1, 2, 3, 2, 2, 1, 2, 3, 3, 1, 3])
+    print(create_mapping2(labels, 0.25))
 
 
 def gen_init_rand_probability(labels, labelled, unlabelled, nr_classes):
