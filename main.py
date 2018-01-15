@@ -2,43 +2,40 @@ import os
 import pickle
 
 import feature_extractor as fe
-from utils import prepare_dataset, create_dict_nets_and_features, misc, dataset_size, prepare_loader_val
+from utils import datasets, nets
+from utils import prepare_val_loader, finetune_model
 from net import evaluate
 
 
 def main():
-    root = 'PycharmProjects/Parametric_GT'
-    current_dataset = 'caltech'
-    out_dir = os.path.join(root, 'out', current_dataset, 'feature_data')
+    root = '.'
+    dataset_name = 'caltech'
+    net_models = ['resnet18', 'resnet152', 'densenet121', 'densenet201']
+    num_exps = 5
     batch_size = 1
+    out_dir = os.path.join(root, 'out', dataset_name, 'feature_data')
 
-    nets_and_features = create_dict_nets_and_features()
-    dataset, stats, number_of_classes = misc(root, current_dataset)
-    dataset_train, dataset_test = prepare_dataset(dataset)
+    dataset = datasets[dataset_name]
+    src, stats, nr_classes, size = dataset['src'], dataset['stats'], dataset['nr_classes'], dataset['size']
 
-    for j in xrange(5):
-        dataset_train += '_' + str(j)
-        dataset_test += '_' + str(j)
-        list_of_net_names = ['resnet18', 'resnet152']  # , 'densenet121', 'densenet201']
-        dataset_size_train = dataset_size(current_dataset)
+    for i in xrange(1, num_exps):
+        for set_ in ('train', 'test'):
+            set_dir = os.path.join(src, set_ + '_' + str(i))
+            set_size = size[set_]
 
-        for i, net_type in enumerate(list_of_net_names):
-            net, feature_size = fe.get_net_info(net_type.split("_")[0], number_of_classes, nets_and_features)
+            for net_model in net_models:
+                print(nr_classes, net_model)
+                ft_model = finetune_model(net_model, nr_classes)
+                set_loader = prepare_val_loader(set_dir, stats, batch_size)
 
-            train_loader = prepare_loader_val(dataset_train, stats, batch_size)
-            # if net is densenet
-            if net_type[:3] == 'den':
-                fc7_features_tr, labels, net, fnames = fe.extract_features_train(net, feature_size, dataset_size_train,
-                                                                                 train_loader, dense=1)
-            # if net is resnet
-            else:
-                fc7_features_tr, labels, net, fnames = fe.extract_features_train(net, feature_size, dataset_size_train,
-                                                                                 train_loader, dense=0)
+                fc7_features_tr, labels, net, fnames = fe.extract_features_train(ft_model, set_size,
+                                                                             set_loader, dense='densenet' in net_model)
 
-            # store the name of the net, the dataset on which we are going to use it, and the testing accuracy
-            net_info = [net_type.split("_")[0], labels, fc7_features_tr, fnames]
-            with open(os.path.join(out_dir, net_type.split("_")[0] + '_' + str(j) + '.pickle'), 'wb') as f:
-                pickle.dump(net_info, f, pickle.HIGHEST_PROTOCOL)
+                # store the name of the net, the dataset on which we are going to use it, and the testing accuracy
+                net_info = [net_model, labels, fc7_features_tr, fnames]
+
+                with open(os.path.join(out_dir + set_, net_model + '_' + str(i) + '.pickle'), 'wb') as f:
+                    pickle.dump(net_info, f, pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':

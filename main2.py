@@ -66,8 +66,8 @@ def main2():
 
         nets_and_features = utils.create_dict_nets_and_features()
 
-        train_loader = utils.prepare_loader_train(dataset_train, stats, batch_size)
-        test_loader = utils.prepare_loader_val(dataset_test, stats, batch_size)
+        train_loader = utils.prepare_train_loader(dataset_train, stats, batch_size)
+        test_loader = utils.prepare_val_loader(dataset_test, stats, batch_size)
 
         net, feature_size = utils.create_net(nr_classes, nets_and_features, net_type=nname)
         criterion = nn.CrossEntropyLoss()
@@ -77,7 +77,6 @@ def main2():
 
         net.load_state_dict(torch.load(best_net))
         net_accuracy = evaluate(net, test_loader)
-
 
 
 if __name__ == '__main__':

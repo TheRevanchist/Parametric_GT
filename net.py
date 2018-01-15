@@ -3,7 +3,7 @@ import torchvision
 import os
 import torch.nn as nn
 import torch.optim as optim
-from utils import prepare_dataset, prepare_loader_train, prepare_loader_val, misc, create_dict_nets_and_features, create_net
+from utils import prepare_dataset, prepare_train_loader, prepare_val_loader, misc, create_dict_nets_and_features, create_net
 
 
 def main():
@@ -24,8 +24,8 @@ def main():
 
     for net_type in net_types:
         inception = net_type == 'inception'
-        train_loader = prepare_loader_train(dataset_train, stats, batch_size, inception)
-        test_loader = prepare_loader_val(dataset_test, stats, batch_size, inception)
+        train_loader = prepare_train_loader(dataset_train, stats, batch_size, inception)
+        test_loader = prepare_val_loader(dataset_test, stats, batch_size, inception)
 
         net, feature_size = create_net(number_of_classes, nets_and_features, net_type=net_type)
         criterion = nn.CrossEntropyLoss()
