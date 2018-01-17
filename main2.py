@@ -20,12 +20,12 @@ from sklearn import svm
 def main2():
 
     # open the file we have to fill
-    results = 'results-01.txt'
-    # with open(results, 'w') as file:
-    #     file.write("Net name " + " trial ind " + "gtg " + "svm " + "ann" + "\n")
+    results = 'results-1-indoors.txt'
+    with open(results, 'w') as file:
+        file.write("Net name " + " trial ind " + "gtg " + "svm " + "ann" + "\n")
 
     root = '.'
-    current_dataset = 'caltech'
+    current_dataset = 'indoors'
     out_dir = os.path.join(root, 'out', current_dataset)
     feature_dir = os.path.join(out_dir, 'feature_data')
     feature_test_dir = os.path.join(out_dir, 'feature_data_test')
@@ -50,15 +50,15 @@ def main2():
 
         nname, ind = pkl_name.split('_')
 
-        names_folds = os.listdir('Datasets/caltech/train_' + str(ind[0]))
+        names_folds = os.listdir('Datasets/indoors/train_' + str(ind[0]))
         names_folds.sort()
         gtg_label_file = os.path.join(gtg_labels_dir, nname + '.txt')
         utils2.gen_gtg_label_file(fnames, names_folds, gtg_labels, gtg_label_file)
 
         # generate the new dataset
-        gen_gtg_dataset('caltech/train_' + str(ind[0]), gtg_label_file, ind[0])
+        gen_gtg_dataset('indoors/train_' + str(ind[0]), gtg_label_file, ind[0])
 
-        stats = (.517, .5015, .4736, .315, .3111, .324)
+        stats = (.485, .456, .406, .229, .224, .225)
 
         del W
 
@@ -92,7 +92,7 @@ def main2():
 
         svm_label_file = os.path.join(svm_labels_dir, nname + '.txt')
         utils2.gen_gtg_label_file(fnames, names_folds, gtg_labels, svm_label_file)
-        gen_gtg_dataset('caltech/train_' + str(ind[0]), svm_label_file, ind[0], 'train_labelled_svm')
+        gen_gtg_dataset('indoors/train_' + str(ind[0]), svm_label_file, ind[0], 'train_labelled_svm')
 
         dataset_train = os.path.join(dataset, 'train_labelled_svm_' + ind[0])
 
@@ -113,7 +113,7 @@ def main2():
         # now check the accuracy of the net trained only in the labelled set
         label_file = os.path.join(only_labelled, nname + '.txt')
         utils2.only_labelled_file(fnames, labelled, label_file)
-        gen_labelled_dataset('caltech/train_' + str(ind[0]), label_file, ind[0])
+        gen_labelled_dataset('indoors/train_' + str(ind[0]), label_file, ind[0])
 
         dataset_train = os.path.join(dataset, 'train_only_labelled_' + ind[0])
 

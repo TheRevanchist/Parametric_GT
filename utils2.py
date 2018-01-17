@@ -89,7 +89,7 @@ def gen_gtg_label_file(fnames, names_folds, labels_GT, out_fname):
     with open(out_fname, 'w') as file:
         for i in xrange(len(fnames)):
             splitted_name = fnames[i][0].split('/')
-            new_name = splitted_name[8] + '/' + splitted_name[9] + ' ' + names_folds[labels_GT[i]] + "\n"
+            new_name = splitted_name[4] + '/' + splitted_name[5] + ' ' + names_folds[labels_GT[i]] + "\n"
             file.write(new_name)
 
 
@@ -98,7 +98,7 @@ def only_labelled_file(fnames, labelled, out_fname):
         for i in xrange(len(fnames)):
             splitted_name = fnames[i][0].split('/')
             if i in labelled:
-                new_name = splitted_name[8] + '/' + splitted_name[9] + ' ' + splitted_name[8] + "\n"
+                new_name = splitted_name[4] + '/' + splitted_name[5] + ' ' + splitted_name[4] + "\n"
                 file.write(new_name)
 
 
