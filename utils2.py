@@ -3,6 +3,7 @@ import sklearn
 import gtg
 import os
 from math import log
+import random
 
 
 def one_hot(labels, nr_classes):
@@ -20,6 +21,19 @@ def create_mapping(nr_objects, percentage_labels):
     labelled = mapping[:nr_labelled]
     unlabelled = mapping[nr_labelled:]
     return np.sort(labelled), np.sort(unlabelled)
+
+
+def create_mapping2(labels, percentage_labels):
+    nr_classes = int(labels.max() + 1)
+
+    labelled, unlabelled = [], []
+    for n_class in xrange(nr_classes):
+        class_labels = list(np.where(labels == n_class)[0])
+        split = int(percentage_labels * len(class_labels))
+        random.shuffle(class_labels)
+        labelled += class_labels[:split]
+        unlabelled += class_labels[split:]
+    return np.array(labelled), np.array(unlabelled)
 
 
 def gen_init_rand_probability(labels, labelled, unlabelled, nr_classes):
