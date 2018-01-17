@@ -5,14 +5,14 @@ import random
 root = 'Datasets'
 
 
-def split(dataset_name, tr_perc, n=5):
+def split(dataset_name, tr_perc, n=1):
     source = os.path.join(root, dataset_name)
 
     for i in range(n):
         for folder in os.listdir(source):
             source_folder = os.path.join(source, folder)
-            train_folder = os.path.join(root, 'caltech', 'train_' + str(i), folder)
-            test_folder = os.path.join(root, 'caltech', 'test_' + str(i), folder)
+            train_folder = os.path.join(root, 'indoors', 'train_' + str(i), folder)
+            test_folder = os.path.join(root, 'indoors', 'test_' + str(i), folder)
 
             try:
                 os.makedirs(train_folder)
@@ -39,7 +39,7 @@ def gen_gtg_dataset(dataset_name, data_fname, ind, out_folder='train_labelled'):
         for line in f:
             fname, lab = line.split(' ')
             lab = lab[:-1]
-            dst_pname = os.path.join(root, 'caltech', out_folder + '_' + str(ind), lab)
+            dst_pname = os.path.join(root, 'indoors', out_folder + '_' + str(ind), lab)
             try:
                 os.makedirs(dst_pname)
             except OSError:
@@ -54,7 +54,7 @@ def gen_labelled_dataset(dataset_name, data_fname, ind):
         for line in f:
             fname, lab = line.split(' ')
             lab = lab[:-1]
-            dst_pname = os.path.join(root, 'caltech', 'train_only_labelled' + '_' + str(ind), lab)
+            dst_pname = os.path.join(root, 'indoors', 'train_only_labelled' + '_' + str(ind), lab)
             try:
                 os.makedirs(dst_pname)
             except OSError:
