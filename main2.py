@@ -107,7 +107,7 @@ def main2():
 
         net.load_state_dict(torch.load(trained_net))
         net_accuracy_svm = evaluate(net, test_loader)
-        print('Accuracy: ' + str(net_accuracy_svm))
+        print('Accuracy: ' + str(net_accuracy_svm)) # bllah
 
 
         # now check the accuracy of the net trained only in the labelled set
