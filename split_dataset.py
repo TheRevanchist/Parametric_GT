@@ -39,17 +39,18 @@ def gen_gtg_dataset(dataset_name, data_fname, ind, out_folder='train_labelled'):
         for line in f:
             try:
                 fname, lab = line.split(' ')
+                lab = lab[:-1]
+                dst_pname = os.path.join(root, 'indoors', out_folder + '_' + str(ind), lab)
+                try:
+                    os.makedirs(dst_pname)
+                except OSError:
+                    pass
+                shutil.copy(os.path.join(source, fname), dst_pname)
             except ValueError:
-                counter += 1
-            lab = lab[:-1]
-            dst_pname = os.path.join(root, 'indoors', out_folder + '_' + str(ind), lab)
-            try:
-                os.makedirs(dst_pname)
-            except OSError:
-                pass
-            shutil.copy(os.path.join(source, fname), dst_pname)
+                continue
+
     print(counter)
-    print("\n\n\n\n\n")
+    print("\n\n")
 
 
 def gen_labelled_dataset(dataset_name, data_fname, ind):

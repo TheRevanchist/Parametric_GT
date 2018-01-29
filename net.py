@@ -39,6 +39,7 @@ def main():
 
 
 def train(net, net_type, train_loader, val_loader, optimizer, criterion, epochs, out_dir, ind):
+    net.train()
 
     for epoch in range(epochs):
         net.train()

@@ -66,7 +66,7 @@ def main2():
         dataset_train = os.path.join(dataset, 'train_labelled_' + ind[0])
         dataset_test = os.path.join(dataset, 'test_' + ind[0])
 
-        max_epochs = 10
+        max_epochs = 1
         batch_size = 8
 
         train_loader = prepare_loader_train(dataset_train, stats, batch_size)

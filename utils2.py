@@ -4,6 +4,7 @@ import gtg
 import os
 from math import log
 import random
+random.seed(314)
 
 
 def one_hot(labels, nr_classes):
@@ -80,7 +81,7 @@ def get_accuracy(W, softmax_features, labels, labelled, unlabelled, testing_set_
     :param testing_set_size: the size of the testing set
     :return: accuracy of our method, accuracy of cnn
     """
-    P_new = gtg.gtg(W, softmax_features, labelled, unlabelled, max_iter=25, labels=labels)
+    P_new = gtg.gtg(W, softmax_features, labelled, unlabelled, max_iter=1, labels=labels)
     conf = sklearn.metrics.confusion_matrix(labels[unlabelled, :], (P_new[unlabelled, :]).argmax(axis=1))
     return float(conf.trace()) / conf.sum(), P_new
 
