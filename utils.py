@@ -9,11 +9,13 @@ from ImageFolder2 import ImageFolder3
 def misc(user, current_dataset):
     datasets = {'imagenet': os.path.join(user, 'Datasets/imagenet'),
                 'caltech': os.path.join(user, 'Datasets/caltech'),
-                'sun': os.path.join(user, 'Datasets/sun')}
+                'sun': os.path.join(user, 'Datasets/sun'),
+                'indoors': os.path.join(user, 'Datasets/indoors')}
     stats_datasets = {'imagenet': (.485, .456, .406, .229, .224, .225),
              'caltech': (.517, .5015, .4736, .315, .3111, .324),
-             'sun': (.472749174938, .461143867394, .432053035945, .265962445818, .263875783693, .289179359433)}
-    num_classes = {'imagenet': 1000, 'caltech': 256, 'sun': 100}
+             'sun': (.472749174938, .461143867394, .432053035945, .265962445818, .263875783693, .289179359433),
+             'indoors': (.485, .456, .406, .229, .224, .225)}
+    num_classes = {'imagenet': 1000, 'caltech': 256, 'sun': 100, 'indoors': 67}
     dataset = datasets[current_dataset]
     stats = stats_datasets[current_dataset]
     number_of_classes = num_classes[current_dataset]
@@ -23,7 +25,8 @@ def misc(user, current_dataset):
 def dataset_size(dataset):
     sizes = {'imagenet': (50000,1),
              'caltech': (20730, 9051),
-             'sun': (4994, 1)}
+             'sun': (4994, 1),
+             'indoors': (10903, 4717)}
     return sizes[dataset]
 
 

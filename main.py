@@ -8,7 +8,7 @@ from net import evaluate
 
 def main():
     root = '.'
-    current_dataset = 'caltech'
+    current_dataset = 'indoors'
     out_dir_tr = os.path.join(root, 'out', current_dataset, 'feature_data')
     out_dir_test = os.path.join(root, 'out', current_dataset, 'feature_data_test')
     batch_size = 1
@@ -17,7 +17,7 @@ def main():
     dataset, stats, number_of_classes = misc(root, current_dataset)
     dataset_train_temp, dataset_test_temp = prepare_dataset(dataset)
 
-    for j in xrange(1, 5):
+    for j in xrange(1):
         dataset_train = dataset_train_temp + '_' + str(j)
         dataset_test = dataset_test_temp + '_' + str(j)
         list_of_net_names = ['resnet18', 'resnet152', 'densenet121', 'densenet201']
@@ -40,7 +40,7 @@ def main():
                 fc7_features_tr, labels_tr, net_tr, fnames_tr = fe.extract_features_train(net, feature_size, dataset_size_train,
                                                                                  train_loader, dense=0)
                 fc7_features_test, labels_test, net_test, fnames_test = fe.extract_features_train(net, feature_size, dataset_size_test,
-                                                                                 train_loader, dense=0)
+                                                                                 test_loader, dense=0)
 
             # store the name of the net, the dataset on which we are going to use it, and the testing accuracy
             net_info_tr = [net_type.split("_")[0], labels_tr, fc7_features_tr, fnames_tr]
