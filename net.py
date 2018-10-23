@@ -24,12 +24,12 @@ def main():
 
     for net_type in net_types:
         inception = net_type == 'inception'
-        train_loader = prepare_loader_train(dataset_train, stats, batch_size, inception)
-        test_loader = prepare_loader_val(dataset_test, stats, batch_size, inception)
+        train_loader = prepare_loader_train(dataset_train, stats, batch_size)
+        test_loader = prepare_loader_val(dataset_test, stats, batch_size)
 
         net, feature_size = create_net(number_of_classes, nets_and_features, net_type=net_type)
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(net.parameters(), lr=1e-4)
+        optimizer = optim.SparseAdam(net.parameters(), lr=1e-4)
 
         best_net = train(net, net_type, train_loader, test_loader, optimizer, criterion, max_epochs, out_dir)
 
